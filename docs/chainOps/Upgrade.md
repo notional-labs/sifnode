@@ -4,55 +4,71 @@
 
 _These instructions assume that you're running our docker standalone solution_.
 
-### Pre-upgrade
-
-Sifchain will publish the time at which your node should halt, via Discord. 
-
-1. Stop your node.
-
-2. Checkout the latest code:
-
-```bash
-git checkout master && git pull
-```
-
-If you previously launched your standalone validator with the `rake "genesis:sifnode:boot..."` command, you'll notice that when you pull down the latest updates, your `./deploy` folder is now empty (apart from your validator config). This is intentional, as we have moved the deployment helm charts and rake tasks to another repository. 
-
-3. To update your node so that it halts at the correct time, run (from the root of the sifnode repository):
-
-```bash
-wget -O ./deploy/docker/mainnet/docker-compose.yml https://raw.githubusercontent.com/Sifchain/sifchain-deploy-public/master/docker/mainnet/docker-compose.yml
-mkdir -p ./deploy/docker/scripts
-wget -O ./deploy/docker/scripts/entrypoint.sh https://raw.githubusercontent.com/Sifchain/sifchain-deploy-public/master/docker/scripts/entrypoint.sh
-chmod +x ./deploy/docker/scripts/entrypoint.sh
-
-TIMESTAMP=<timestamp> GAS_PRICE="0.5rowan" docker-compose -f ./deloy/docker/mainnet/docker-compose.yml up
-```
-
-Replace `<timestamp>` with the timestamp that is announced on Discord. The above will also replace your existing `docker-compose.yml` and `entrypoint.sh` with slightly modified versions, to allow your node to halt and be upgraded. You will see a number of warnings about values being empty when you restart your node; you can safely ignore these.
-
 ### Upgrade
 
-Once the upgrade time has been reached, your node will automatically halt. If you attempt to restart it, it'll remain idle.
+1. Halt your node.
 
-To upgrade your node, run (from the root of the sifnode repository):
+2. Open up a terminal to your node using `docker run`. You must switch to the parent directory where the node's `.sifnoded` and `.sifnodecli` directories live, and run:
 
 ```bash
-CHAINNET=sifchain-1 \
-UPGRADE_NODE=true \
-INITIAL_HEIGHT=<height> \
-COSMOS_SDK_VERSION="0.40" \
-GENESIS_TIME=<time> \
-VERSION="0.9.0" \
-CURRENT_VERSION="0.8.8" \
-DATA_MIGRATE_VERSION="0.9" \
-GAS_PRICE="0.5rowan" \
-docker-compose -f ./deploy/docker/mainnet/docker-compose.yml up
+docker run -v `pwd`:/root -it sifchain/sifnoded:mainnet-genesis /bin/sh
 ```
 
-Replace `<height>` and `<time>` with what is announced on Discord.
+3. Take a backup of the `config` and `data` directories:
 
-3. Your node will upgrade itself and connect back into the network.
+```bash
+BACKUP_DIR="${HOME}"/.sifnoded/backups/$(date +%s%N)/
+mkdir -p "${BACKUP_DIR}"
+cp -avr "${HOME}"/.sifnoded/data/ "${BACKUP_DIR}"
+cp -avr "${HOME}"/.sifnoded/config/ "${BACKUP_DIR}"
+```
+
+4. Download the new binary:
+
+```bash
+mkdir -p "${HOME}"/.sifnoded/cosmovisor/upgrades/0.9.0/bin
+cd "${HOME}"/.sifnoded/cosmovisor/upgrades/0.9.0/bin
+wget -O sifnoded.zip https://github.com/Sifchain/sifnode/releases/download/mainnet-0.9.0/sifnoded-mainnet-0.9.0-linux-amd64.zip
+```
+
+5. Very the checksum:
+
+```bash
+sha256sum sifnoded.zip
+```
+
+and ensure that it matches:
+
+```
+2c82a37c62e185b9211a01fe831d35beb4b01fb7438fee555dd61e3c47c0cf8c
+```
+
+6. Unzip the binary:
+
+```bash
+unzip sifnoded.zip
+```
+
+7. Reset the state of your node:
+
+```bash
+sifnoded unsafe-reset-all
+```
+
+8. Download the updated `app.toml`:
+
+```bash
+wget -O "${HOME}"/.sifnoded/config/app.toml https://raw.githubusercontent.com/Sifchain/networks/master/config/sifchain-1/app.toml
+```
+
+9. Update the `config.toml`:
+
+```bash
+sed -ri 's/log_level.*/log_level = \"info\"/g' "${HOME}"/.sifnoded/config/config.toml
+sed -ri 's/persistent_peers.*/persistent_peers = \"87688830f890e5374fd4638942397a65d05f703b@13.213.156.252:26656\"/g' "${HOME}"/.sifnoded/config/config.toml
+```
+
+10. Exit the shell and restart your node. It'll now connect and start synchronising.
 
 ## k8s
 
