@@ -68,7 +68,14 @@ sed -ri 's/log_level.*/log_level = \"info\"/g' "${HOME}"/.sifnoded/config/config
 sed -ri 's/persistent_peers.*/persistent_peers = \"87688830f890e5374fd4638942397a65d05f703b@13.213.156.252:26656\"/g' "${HOME}"/.sifnoded/config/config.toml
 ```
 
-10. Exit the shell and restart your node. It'll now connect and start synchronising.
+10. Tell cosmovisor to use the new binary:
+
+```bash
+rm "${HOME}"/.sifnoded/cosmovisor/current
+ln -s "${HOME}"/.sifnoded/cosmovisor/upgrades/0.9.0 "${HOME}"/.sifnoded/cosmovisor/current
+```
+
+11. Exit the shell and restart your node. It'll now connect and start synchronising.
 
 ## k8s
 
