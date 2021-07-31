@@ -31,7 +31,7 @@ cd "${HOME}"/.sifnoded/cosmovisor/upgrades/0.9.0/bin
 wget -O sifnoded.zip https://github.com/Sifchain/sifnode/releases/download/mainnet-0.9.0/sifnoded-mainnet-0.9.0-linux-amd64.zip
 ```
 
-5. Very the checksum:
+5. Very the hash:
 
 ```bash
 sha256sum sifnoded.zip
@@ -61,28 +61,40 @@ unzip sifnoded.zip
 wget -O "${HOME}"/.sifnoded/config/app.toml https://raw.githubusercontent.com/Sifchain/networks/master/config/sifchain-1/app.toml
 ```
 
-9. Download the new Genesis:
+9. Download the new genesis:
 
 ```bash
 wget -O "${HOME}"/.sifnoded/config/genesis.json.gz https://raw.githubusercontent.com/Sifchain/networks/master/mainnet/sifchain-1/genesis.json.gz
 gunzip "${HOME}"/.sifnoded/config/genesis.json.gz
 ```
 
-10. Update the `config.toml`:
+10. Verify the genesis hash:
+
+```bash
+jq -S -c -M '.' genesis.json | sha256sum
+```
+
+and ensure that it matches:
+
+```
+42f07301312f6211bb95d8eb87d34770ad0ed712932e4c99dea7b01dd493dc1a
+```
+
+11. Update the `config.toml`:
 
 ```bash
 sed -ri 's/log_level.*/log_level = \"info\"/g' "${HOME}"/.sifnoded/config/config.toml
 sed -ri 's/persistent_peers.*/persistent_peers = \"87688830f890e5374fd4638942397a65d05f703b@13.213.156.252:26656\"/g' "${HOME}"/.sifnoded/config/config.toml
 ```
 
-11. Tell cosmovisor to use the new binary:
+12. Tell cosmovisor to use the new binary:
 
 ```bash
 rm "${HOME}"/.sifnoded/cosmovisor/current
 ln -s "${HOME}"/.sifnoded/cosmovisor/upgrades/0.9.0 "${HOME}"/.sifnoded/cosmovisor/current
 ```
 
-12. Exit the shell and restart your node. It'll now connect and start synchronising.
+13. Exit the shell and restart your node. It'll now connect and start synchronising.
 
 ## k8s
 
