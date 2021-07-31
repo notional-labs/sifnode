@@ -52,7 +52,7 @@ unzip sifnoded.zip
 7. Reset the state of your node:
 
 ```bash
-sifnoded unsafe-reset-all
+"${HOME}"/.sifnoded/cosmovisor/upgrades/0.9.0/bin/sifnoded unsafe-reset-all
 ```
 
 8. Download the updated `app.toml`:
