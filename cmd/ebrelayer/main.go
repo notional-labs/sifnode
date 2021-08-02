@@ -2,15 +2,17 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"net/url"
+	"os"
+	"strconv"
+	"strings"
+	"sync"
+
 	"github.com/Sifchain/sifnode/cmd/ebrelayer/internal/symbol_translator"
 	"github.com/Sifchain/sifnode/cmd/ebrelayer/txs"
 	ebrelayertypes "github.com/Sifchain/sifnode/cmd/ebrelayer/types"
 	flag "github.com/spf13/pflag"
-	"log"
-	"net/url"
-	"os"
-	"strings"
-	"sync"
 
 	sifapp "github.com/Sifchain/sifnode/app"
 	"github.com/Sifchain/sifnode/cmd/ebrelayer/contract"
@@ -107,9 +109,9 @@ func buildRootCmd() *cobra.Command {
 func initRelayerCmd() *cobra.Command {
 	//nolint:lll
 	initRelayerCmd := &cobra.Command{
-		Use:     "init [tendermintNode] [web3Provider] [bridgeRegistryContractAddress] [validatorMoniker] [validatorMnemonic]",
+		Use:     "init [tendermintNode] [web3Provider] [ethereum_chain_id] [bridgeRegistryContractAddress] [validatorMoniker] [validatorMnemonic]",
 		Short:   "Validate credentials and initialize subscriptions to both chains",
-		Args:    cobra.ExactArgs(5),
+		Args:    cobra.ExactArgs(6),
 		Example: "ebrelayer init tcp://localhost:26657 ws://localhost:7545/ 0x30753E4A8aad7F8597332E813735Def5dD395028 validator mnemonic --chain-id=peggy",
 		RunE:    RunInitRelayerCmd,
 	}
@@ -178,15 +180,23 @@ func RunInitRelayerCmd(cmd *cobra.Command, args []string) error {
 	}
 	web3Provider := args[1]
 
-	if !common.IsHexAddress(args[2]) {
-		return errors.Errorf("invalid [bridge-registry-contract-address]: %s", args[2])
+	if len(strings.Trim(args[2], "")) == 0 {
+		return errors.Errorf("invalid [ethereum_chain_id]: %s", args[2])
 	}
-	contractAddress := common.HexToAddress(args[2])
+	ethereumChainId, err := strconv.ParseInt(args[2], 10, 64)
+	if err != nil {
+		return errors.Errorf("Could not parse [ethereum_chain_id] into int64: %s", err)
+	}
 
-	if len(strings.Trim(args[3], "")) == 0 {
-		return errors.Errorf("invalid [validator-moniker]: %s", args[3])
+	if !common.IsHexAddress(args[3]) {
+		return errors.Errorf("invalid [bridge-registry-contract-address]: %s", args[3])
 	}
-	validatorMoniker := args[3]
+	contractAddress := common.HexToAddress(args[3])
+
+	if len(strings.Trim(args[4], "")) == 0 {
+		return errors.Errorf("invalid [validator-moniker]: %s", args[4])
+	}
+	validatorMoniker := args[4]
 
 	logConfig := zap.NewDevelopmentConfig()
 	logConfig.Sampling = nil
@@ -215,6 +225,7 @@ func RunInitRelayerCmd(cmd *cobra.Command, args []string) error {
 		nodeURL,
 		validatorMoniker,
 		web3Provider,
+		ethereumChainId,
 		contractAddress,
 		nil,
 		db,

@@ -6,14 +6,16 @@ import (
 	"context"
 	"crypto/ecdsa"
 	"fmt"
-	"github.com/Sifchain/sifnode/cmd/ebrelayer/internal/symbol_translator"
 	"log"
 	"math/big"
 	"os"
 	"os/signal"
+	"strconv"
 	"sync"
 	"syscall"
 	"time"
+
+	"github.com/Sifchain/sifnode/cmd/ebrelayer/internal/symbol_translator"
 
 	"github.com/cosmos/cosmos-sdk/client/tx"
 
@@ -45,6 +47,7 @@ const (
 type EthereumSub struct {
 	EthProvider             string
 	TmProvider              string
+	NetworkID               int64
 	RegistryContractAddress common.Address
 	ValidatorName           string
 	ValidatorAddress        sdk.ValAddress
@@ -72,6 +75,7 @@ func NewEthereumSub(
 	nodeURL string,
 	validatorMoniker,
 	ethProvider string,
+	networkID int64,
 	registryContractAddress common.Address,
 	validatorAddress sdk.ValAddress,
 	db *leveldb.DB,
@@ -82,6 +86,7 @@ func NewEthereumSub(
 		EthProvider:             ethProvider,
 		TmProvider:              nodeURL,
 		RegistryContractAddress: registryContractAddress,
+		NetworkID:               networkID,
 		ValidatorName:           validatorMoniker,
 		ValidatorAddress:        validatorAddress,
 		CliCtx:                  cliCtx,
@@ -140,8 +145,8 @@ func (sub EthereumSub) Start(txFactory tx.Factory, completionEvent *sync.WaitGro
 	defer subHead.Unsubscribe()
 
 	var lastProcessedBlock *big.Int
-
-	data, err := sub.DB.Get([]byte(ethLevelDBKey), nil)
+	levelDBKey := strconv.FormatInt(sub.NetworkID, 10) + ethLevelDBKey
+	data, err := sub.DB.Get([]byte(levelDBKey), nil)
 	if err != nil {
 		sub.SugaredLogger.Errorw("failed to get the last ethereum block from level db.",
 			errorMessageKey, err.Error())
@@ -234,7 +239,7 @@ func (sub EthereumSub) Start(txFactory tx.Factory, completionEvent *sync.WaitGro
 			// add 1 to the current block so we don't reprocess it
 			endingBlock = endingBlock.Add(endingBlock, big.NewInt(1))
 			// save the current ending block + 1 to the lastprocessed block to ensure we keep reading blocks sequentially and don't repeat blocks
-			err = sub.DB.Put([]byte(ethLevelDBKey), endingBlock.Bytes(), nil)
+			err = sub.DB.Put([]byte(levelDBKey), endingBlock.Bytes(), nil)
 			if err != nil {
 				// if you can't write to leveldb, then error out as something is seriously amiss
 				log.Fatalf("Error saving lastProcessedBlock to leveldb: %v", err)
