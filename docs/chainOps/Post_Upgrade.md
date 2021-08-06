@@ -1,4 +1,4 @@
-# Upgrading to Cosmos 0.42 on BetaNet (External Validator Operators)
+# Post-upgrade to Cosmos 0.42 on BetaNet (External k8s Validator Operators)
 
 This is for those validators running Kubernetes, who recently upgraded from Cosmos 0.39 to Cosmos 0.42.
 
