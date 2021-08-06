@@ -12,7 +12,7 @@ The upgrade scripts are no longer required and as such, can be removed from your
 git checkout master && git pull
 ```
 
-Please check that the latest commit hash is `e37729f5fa737c2b8b3411bf0c64f1373a046a2d`.
+Please check that the latest commit hash is `e37729f5fa737c2b8b3411bf0c64f1373a046a2d`. It's important that this matches. Please contact us on Discord if unsure.
 
 3. Deploy the latest helm updates to update your node:
 
@@ -20,7 +20,7 @@ Please check that the latest commit hash is `e37729f5fa737c2b8b3411bf0c64f1373a0
 export CLUSTER_NAME=<cluster_name>
 export KUBECONFIG=./.live/${CLUSTER_NAME}/kubeconfig_${CLUSTER_NAME}
 
-helm upgrade sifnode ../deploy/helm/standalone/sifnode \
+helm upgrade sifnode ./helm/standalone/sifnode \
 --install -n sifnode --create-namespace \
 --set sifnode.args.enableRpc="true" \
 --set sifnode.args.enableExternalRpc="false" \
