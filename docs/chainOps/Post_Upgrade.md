@@ -18,7 +18,7 @@ Please check that the latest commit hash is `e37729f5fa737c2b8b3411bf0c64f1373a0
 
 ```bash
 export CLUSTER_NAME=<cluster_name>
-export KUBECONFIG=./.live/${CLUSTER_NAME}/kubeconfig_${CLUSTER_NAME}
+export KUBECONFIG=../.live/${CLUSTER_NAME}/kubeconfig_${CLUSTER_NAME}
 
 helm upgrade sifnode ./helm/standalone/sifnode \
 --install -n sifnode --create-namespace \
