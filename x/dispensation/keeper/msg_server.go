@@ -10,6 +10,7 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/Sifchain/sifnode/x/dispensation/types"
+	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 )
 
 type msgServer struct {
@@ -27,10 +28,24 @@ var _ types.MsgServer = msgServer{}
 func (srv msgServer) CreateDistribution(ctx context.Context,
 	msg *types.MsgCreateDistribution) (*types.MsgCreateDistributionResponse, error) {
 
+	rules := []tracer.SamplingRule{tracer.RateRule(1)}
+	tracer.Start(
+		tracer.WithSamplingRules(rules),
+		tracer.WithService("sifnode"),
+		tracer.WithEnv("test"),
+	)
+	defer tracer.Stop()
+
+	// // Start a root span.
+	span := tracer.StartSpan("disp.createserver")
+	defer span.Finish()
+
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	distributionName := fmt.Sprintf("%d_%s", sdkCtx.BlockHeight(), msg.Distributor)
+	verifySpan := tracer.StartSpan("disp.VerifyAndSetDistribution", tracer.ChildOf(span.Context()))
 	// Verify if distribution already exists
 	err := srv.Keeper.VerifyAndSetDistribution(sdkCtx, distributionName, msg.DistributionType, msg.AuthorizedRunner)
+	verifySpan.Finish(tracer.WithError(err))
 	if err != nil {
 		return nil, err
 	}
@@ -39,14 +54,17 @@ func (srv msgServer) CreateDistribution(ctx context.Context,
 	if err != nil {
 		return nil, errors.Wrap(err, "Error calculating required amount from outputs")
 	}
+	accumSpan := tracer.StartSpan("disp.AccumulateDrops", tracer.ChildOf(span.Context()))
 	//Accumulate all Drops into the ModuleAccount
 	err = srv.Keeper.AccumulateDrops(sdkCtx, msg.Distributor, totalOutput)
+	accumSpan.Finish(tracer.WithError(err))
 	if err != nil {
 		return nil, err
 	}
-
+	createSpan := tracer.StartSpan("disp.CreateDrops", tracer.ChildOf(span.Context()))
 	//Create drops and Store Historical Data
 	err = srv.Keeper.CreateDrops(sdkCtx, msg.Output, distributionName, msg.DistributionType, msg.AuthorizedRunner)
+	createSpan.Finish(tracer.WithError(err))
 	if err != nil {
 		return nil, err
 	}
@@ -94,8 +112,23 @@ func (srv msgServer) RunDistribution(ctx context.Context, distribution *types.Ms
 	// Not checking whether the distribution exists or not .
 	// We only need to run and execute distribution records
 	// Distribute 10 drops for msg.DistributionName authorized to msg.DistributionRunner
+
+	rules := []tracer.SamplingRule{tracer.RateRule(1)}
+	tracer.Start(
+		tracer.WithSamplingRules(rules),
+		tracer.WithService("sifnode"),
+		tracer.WithEnv("test"),
+	)
+	defer tracer.Stop()
+
+	// // Start a root span.
+	span := tracer.StartSpan("disp.createserver")
+	defer span.Finish()
+
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	distributeSpan := tracer.StartSpan("disp.DistributeDrops", tracer.ChildOf(span.Context()))
 	records, err := srv.Keeper.DistributeDrops(sdkCtx, sdkCtx.BlockHeight(), distribution.DistributionName, distribution.AuthorizedRunner, distribution.DistributionType)
+	distributeSpan.Finish(tracer.WithError(err))
 	if err != nil {
 		return nil, err
 	}

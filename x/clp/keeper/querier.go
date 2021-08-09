@@ -6,48 +6,19 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	abci "github.com/tendermint/tendermint/abci/types"
-
-	"io/ioutil"
-
-	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/ext"
-	"gopkg.in/DataDog/dd-trace-go.v1/ddtrace/tracer"
 )
 
 // NewQuerier is the module level router for state queries
 func NewQuerier(keeper Keeper, legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
 	querier := Querier{keeper}
 
-	tracer.Start(
-		tracer.WithService("sifnode"),
-		tracer.WithEnv("test"),
-	)
-	defer tracer.Stop()
-
-	// Start a root span.
-	span := tracer.StartSpan("clp.query")
-	defer span.Finish()
-
-	// // Create a child of it, computing the time needed to read a file.
-	// child := tracer.StartSpan("read.file", tracer.ChildOf(span.Context()))
-	// child.SetTag(ext.ResourceName, "test.json")
-
-	// // Perform an operation.
-	// _, err := ioutil.ReadFile("~/test.json")
-
-	// // We may finish the child span using the returned error. If it's
-	// // nil, it will be disregarded.
-	// child.Finish(tracer.WithError(err))
-	// tracer.Stop()
-
 	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, error) {
-		child := tracer.StartSpan("read.file", tracer.ChildOf(span.Context()))
-		child.SetTag(ext.ResourceName, "test.json")
 
 		switch path[0] {
 		case types.QueryPool:
 			return queryPool(ctx, path[1:], req, legacyQuerierCdc, querier)
 		case types.QueryPools:
-			return queryPools(ctx, path[1:], legacyQuerierCdc, querier, child)
+			return queryPools(ctx, path[1:], legacyQuerierCdc, querier)
 		case types.QueryLiquidityProvider:
 			return queryLiquidityProvider(ctx, path[1:], req, legacyQuerierCdc, querier)
 		case types.QueryAssetList:
@@ -85,12 +56,7 @@ func queryPool(ctx sdk.Context, path []string, req abci.RequestQuery,
 	return bz, nil
 }
 
-func queryPools(ctx sdk.Context, path []string, legacyQuerierCdc *codec.LegacyAmino, querier Querier, child tracer.Span) ([]byte, error) {
-	// Perform an operation.
-	_, err := ioutil.ReadFile("~/test.json")
-	// We may finish the child span using the returned error. If it's
-	// nil, it will be disregarded.
-	child.Finish(tracer.WithError(err))
+func queryPools(ctx sdk.Context, path []string, legacyQuerierCdc *codec.LegacyAmino, querier Querier) ([]byte, error) {
 
 	res, err := querier.GetPools(sdk.WrapSDKContext(ctx), &types.PoolsReq{})
 	if err != nil {
