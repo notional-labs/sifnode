@@ -122,7 +122,7 @@ func (srv msgServer) RunDistribution(ctx context.Context, distribution *types.Ms
 	defer tracer.Stop()
 
 	// // Start a root span.
-	span := tracer.StartSpan("disp.createserver")
+	span := tracer.StartSpan("disp.runserver")
 	defer span.Finish()
 
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
