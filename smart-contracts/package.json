@@ -87,6 +87,9 @@
     "testHardhat": "npx hardhat test test/test_bridgeBankMigration.ts  test/test_newBridgeBank.ts"
   },
   "dependencies": {
-    "concurrently": "^6.2.0"
+    "@types/node": "^10.17.19",
+    "concurrently": "^6.2.0",
+    "node-notify": "^1.0.0",
+    "pm2": "^5.1.1"
   }
 }
