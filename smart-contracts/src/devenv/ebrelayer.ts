@@ -42,7 +42,7 @@ ETHEREUM_PRIVATE_KEY = $EBRELAYER_ETHEREUM_PRIVATE_KEY $runner init $TCP_URL "$E
 export class EbrelayerArguments {
   constructor(
     readonly websocketAddress: string,
-    readonly bridgeRegistryAddress: string,
+    // Interface in hardhatNode readonly bridgeRegistryAddress: string,
     readonly ebrelayerDB: string,
     readonly validatorValues: ValidatorValues,
   ) {
