@@ -44,7 +44,10 @@ git checkout master && git pull
 
 2. Fix your node by running:
 
-```
+```bash
+export CLUSTER_NAME=<cluster_name>
+export KUBECONFIG=../.live/${CLUSTER_NAME}/kubeconfig_${CLUSTER_NAME}
+
 helm upgrade sifnode ./helm/standalone/sifnode \
 --install -n sifnode-api --create-namespace \
 --set sifnode.args.upgrade.fix="true" \
@@ -55,3 +58,5 @@ helm upgrade sifnode ./helm/standalone/sifnode \
 --set image.tag=mainnet-0.9.0 \
 --set image.repository=sifchain/sifnoded
 ```
+
+Replace <cluster_name> with the full name of your cluster.
