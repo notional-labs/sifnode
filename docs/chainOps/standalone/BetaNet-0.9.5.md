@@ -49,7 +49,7 @@ helm upgrade sifnode ./helm/standalone/sifnode \
 --install -n sifnode-api --create-namespace \
 --set sifnode.args.upgrade.fix="true" \
 --set sifnode.args.upgrade.version="0.9.5" \
---set sifnode.args.upgrade.height="2976500" \
+--set sifnode.args.upgrade.height=2976500 \
 --set sifnode.args.enableRpc="true" \
 --set sifnode.args.enableExternalRpc="false" \
 --set image.tag=mainnet-0.9.0 \
