@@ -59,4 +59,4 @@ helm upgrade sifnode ./helm/standalone/sifnode \
 --set image.repository=sifchain/sifnoded
 ```
 
-Replace <cluster_name> with the full name of your cluster.
+Replace `<cluster_name>` with the full name of your cluster.
