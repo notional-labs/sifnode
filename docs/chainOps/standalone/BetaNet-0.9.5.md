@@ -52,6 +52,6 @@ helm upgrade sifnode ./helm/standalone/sifnode \
 --set sifnode.args.upgrade.height="2976500" \
 --set sifnode.args.enableRpc="true" \
 --set sifnode.args.enableExternalRpc="false" \
---set image.tag=testnet-0.9.0 \
+--set image.tag=mainnet-0.9.0 \
 --set image.repository=sifchain/sifnoded
 ```
