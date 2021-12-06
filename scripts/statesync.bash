@@ -13,8 +13,11 @@ go install -tags badgerdb ./...
 
 
 # MAKE HOME FOLDER AND GET GENESIS
-iris init test 
-wget -O ~/.iris/config/genesis.json https://cloudflare-ipfs.com/ipfs/QmfZoTRfuao6MU6Cns4ZpHDVrKMfbwjKDUEDH59U5Gweky
+sifnoded init test 
+wget -O ~/.sifnoded/config/genesis.json.gz https://cloudflare-ipfs.com/ipfs/QmeotEhwc67AnkHSYE53421DJAb1odHAsKLDUc7qBpXErA
+cd ~/.sifnoded/config
+gunzip genesis.json.gz
+cd -
 
 INTERVAL=1000
 
