@@ -7,7 +7,6 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 
-	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -67,11 +66,6 @@ func (b AppModuleBasic) RegisterGRPCGatewayRoutes(c sdkclient.Context, serveMux 
 	// TODO: Register grpc gateway
 }
 
-// RegisterRESTRoutes registers the REST routes for the ethbridge module.
-func (b AppModuleBasic) RegisterRESTRoutes(ctx sdkclient.Context, router *mux.Router) {
-	client.RegisterRESTRoutes(ctx, router, StoreKey)
-}
-
 // GetTxCmd returns the root tx command for the ethbridge module.
 func (b AppModuleBasic) GetTxCmd() *cobra.Command {
 	return client.GetTxCmd()
@@ -107,7 +101,8 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {
 func NewAppModule(
 	oracleKeeper types.OracleKeeper, bankKeeper types.BankKeeper,
 	accountKeeper types.AccountKeeper, bridgeKeeper Keeper,
-	cdc *codec.Codec) AppModule {
+	cdc *codec.Codec,
+) AppModule {
 	return AppModule{
 		AppModuleBasic:      AppModuleBasic{},
 		AppModuleSimulation: AppModuleSimulation{},

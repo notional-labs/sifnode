@@ -1,14 +1,11 @@
 package client
 
 import (
-	sdkclient "github.com/cosmos/cosmos-sdk/client"
-	"github.com/gorilla/mux"
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
 
 	"github.com/Sifchain/sifnode/x/ethbridge/client/cli"
-	"github.com/Sifchain/sifnode/x/ethbridge/client/rest"
 	"github.com/Sifchain/sifnode/x/ethbridge/types"
 )
 
@@ -53,9 +50,4 @@ func GetTxCmd() *cobra.Command {
 	)
 
 	return ethBridgeTxCmd
-}
-
-// RegisterRESTRoutes - Central function to define routes that get registered by the main application
-func RegisterRESTRoutes(cliCtx sdkclient.Context, r *mux.Router, storeName string) {
-	rest.RegisterRESTRoutes(cliCtx, r, storeName)
 }

@@ -1,19 +1,19 @@
 package ante_test
 
 import (
+	"testing"
+
 	sifapp "github.com/Sifchain/sifnode/app"
 	"github.com/Sifchain/sifnode/app/ante"
 	clptypes "github.com/Sifchain/sifnode/x/clp/types"
 	dispensationtypes "github.com/Sifchain/sifnode/x/dispensation/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth/legacy/legacytx"
+	"github.com/cosmos/cosmos-sdk/x/auth/migrations/legacytx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	ibctransfertypes "github.com/cosmos/ibc-go/v2/modules/apps/transfer/types"
+	ibctransfertypes "github.com/cosmos/ibc-go/v5/modules/apps/transfer/types"
 	"github.com/stretchr/testify/require"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
-
-	"testing"
 )
 
 func TestAdjustGasPriceDecorator_AnteHandle(t *testing.T) {

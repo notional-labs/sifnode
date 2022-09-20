@@ -4,12 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/Sifchain/sifnode/x/dispensation/client/rest"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	"github.com/gorilla/mux"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
@@ -66,13 +63,8 @@ func (AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, config client.TxEncod
 	return ValidateGenesis(data)
 }
 
-// RegisterRESTRoutes registers the REST routes for the dispensation module.
-func (AppModuleBasic) RegisterRESTRoutes(ctx client.Context, rtr *mux.Router) {
-	rest.RegisterRoutes(ctx, rtr)
-}
-
 func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *runtime.ServeMux) {
-	//types.RegisterQueryHandlerClient(context.Background(), mux, types.NewQueryClient(clientCtx))
+	// types.RegisterQueryHandlerClient(context.Background(), mux, types.NewQueryClient(clientCtx))
 }
 
 // GetTxCmd returns the root tx command for the dispensation module.

@@ -9,14 +9,13 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
-	"github.com/cosmos/ibc-go/v2/modules/apps/transfer"
-	sdktransferkeeper "github.com/cosmos/ibc-go/v2/modules/apps/transfer/keeper"
-	"github.com/cosmos/ibc-go/v2/modules/core/04-channel/types"
-	porttypes "github.com/cosmos/ibc-go/v2/modules/core/05-port/types"
+	"github.com/cosmos/ibc-go/v5/modules/apps/transfer"
+	sdktransferkeeper "github.com/cosmos/ibc-go/v5/modules/apps/transfer/keeper"
+	"github.com/cosmos/ibc-go/v5/modules/core/04-channel/types"
+	porttypes "github.com/cosmos/ibc-go/v5/modules/core/05-port/types"
 
-	sdktransfertypes "github.com/cosmos/ibc-go/v2/modules/apps/transfer/types"
-	"github.com/cosmos/ibc-go/v2/modules/core/exported"
-	"github.com/gorilla/mux"
+	sdktransfertypes "github.com/cosmos/ibc-go/v5/modules/apps/transfer/types"
+	"github.com/cosmos/ibc-go/v5/modules/core/exported"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
@@ -62,11 +61,6 @@ func (am AppModuleBasic) DefaultGenesis(cdc codec.JSONCodec) json.RawMessage {
 // ValidateGenesis performs genesis state validation for the module.
 func (am AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, config client.TxEncodingConfig, bz json.RawMessage) error {
 	return am.cosmosAppModule.ValidateGenesis(cdc, config, bz)
-}
-
-// RegisterRESTRoutes registers the REST routes for the module.
-func (am AppModuleBasic) RegisterRESTRoutes(ctx client.Context, rtr *mux.Router) {
-	am.cosmosAppModule.RegisterRESTRoutes(ctx, rtr)
 }
 
 func (am AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *runtime.ServeMux) {

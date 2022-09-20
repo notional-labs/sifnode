@@ -45,7 +45,7 @@ func setup(withGenesis bool, invCheckPeriod uint, blacklist []sdk.AccAddress) (*
 	encCdc := MakeTestEncodingConfig()
 	app := NewSifAppWithBlacklist(log.NewNopLogger(), db, nil, true, map[int64]bool{}, DefaultNodeHome, invCheckPeriod, encCdc, EmptyAppOptions{}, blacklist)
 	if withGenesis {
-		return app, NewDefaultGenesisState(encCdc.Marshaler)
+		return app, NewDefaultGenesisState(encCdc.Codec)
 	}
 	return app, GenesisState{}
 }
@@ -186,7 +186,7 @@ func CreateRandomAccounts(accNum int) []sdk.AccAddress {
 }
 
 func TestAddr(addr string, bech string) (sdk.AccAddress, error) {
-	res, err := sdk.AccAddressFromHex(addr)
+	res, err := sdk.AccAddressFromHexUnsafe(addr)
 	if err != nil {
 		return nil, err
 	}

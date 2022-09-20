@@ -10,13 +10,11 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
-	"github.com/gorilla/mux"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 	abci "github.com/tendermint/tendermint/abci/types"
 
 	"github.com/Sifchain/sifnode/x/clp/client/cli"
-	"github.com/Sifchain/sifnode/x/clp/client/rest"
 	"github.com/Sifchain/sifnode/x/clp/keeper"
 	"github.com/Sifchain/sifnode/x/clp/types"
 )
@@ -61,11 +59,6 @@ func (AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, _ client.TxEncodingCo
 	return ValidateGenesis(data)
 }
 
-// RegisterRESTRoutes registers the REST routes for the clp module.
-func (AppModuleBasic) RegisterRESTRoutes(ctx client.Context, rtr *mux.Router) {
-	rest.RegisterRoutes(ctx, rtr)
-}
-
 // RegisterGRPCGatewayRoutes registers the gRPC Gateway routes for the clp module.
 func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *runtime.ServeMux) {
 	err := types.RegisterQueryHandlerClient(context.Background(), mux, types.NewQueryClient(clientCtx))
@@ -81,7 +74,7 @@ func (AppModuleBasic) GetTxCmd() *cobra.Command {
 
 // GetQueryCmd returns no root query command for the clp module.
 func (AppModuleBasic) GetQueryCmd() *cobra.Command {
-	return cli.GetQueryCmd(types.StoreKey)
+	return cli.GetQueryCmd(storetypes.StoreKey)
 }
 
 //____________________________________________________________________________

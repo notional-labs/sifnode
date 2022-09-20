@@ -8,7 +8,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/types/query"
-	chtypes "github.com/cosmos/ibc-go/v2/modules/core/04-channel/types"
+	chtypes "github.com/cosmos/ibc-go/v5/modules/core/04-channel/types"
 	"github.com/spf13/cobra"
 	rpchttp "github.com/tendermint/tendermint/rpc/client/http"
 
@@ -109,8 +109,8 @@ func getCommittedPackets(
 	cmd *cobra.Command,
 	nodeURI string,
 	portID string,
-	channelID string) ([]uint64, error) {
-
+	channelID string,
+) ([]uint64, error) {
 	clientCtx, err := getClientContext(cmd, nodeURI)
 	if err != nil {
 		return nil, err
@@ -164,8 +164,8 @@ func getUnreceivedPackets(
 	nodeURI string,
 	committedPackets []uint64,
 	portID string,
-	channelID string) ([]uint64, error) {
-
+	channelID string,
+) ([]uint64, error) {
 	clientCtx, err := getClientContext(cmd, nodeURI)
 	if err != nil {
 		panic(err)
